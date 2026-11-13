@@ -59,3 +59,27 @@ python check_compustat_merge.py --na "D:\...\NA 2008-2025.xlsx" --global "D:\...
 | `6_年度對照.csv` | 各年度預期列數與實際列數 |
 
 結束代碼：0 代表通過（可能附警告），1 代表不通過。
+
+## 重新產生正確的合併檔：`merge_compustat.py`
+
+這支程式要和 `check_compustat_merge.py` 放在同一個資料夾，它會共用後者的讀檔與正規化功能。
+
+```powershell
+py merge_compustat.py                     # 輸出 Compustat_NA_Global_2008-2025_v2.csv，不覆蓋舊檔
+py check_compustat_merge.py --merged "D:\AI ecosystem\財務資料\Compustat_NA_Global_2008-2025_v2.csv"
+```
+
+合併規則：
+
+- 以 `(gvkey, datadate)` 去重，NA 與 Global 重疊時保留 NA。加上 `--prefer global` 可改為保留 Global。
+- 不用 `(gvkey, fyear)` 去重。
+- 只刪除整列完全相同的重複列。
+- 數值照抄來源，不補值。
+
+另外新增三個欄位：
+
+| 欄位 | 意義 |
+|---|---|
+| `source` | 這一列來自 NA 還是 Global |
+| `in_both` | 這個 (gvkey, datadate) 在兩邊都有（1/0） |
+| `firm_in_both` | 這個 gvkey 在兩邊都出現過（1/0） |
